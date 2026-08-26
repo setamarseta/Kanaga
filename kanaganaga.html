@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kenapa Kak Dika harusssss jadi kanaga aku</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+<!-- Confetti Library untuk Selebrasi Elegan -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+  :root{
+    --purple: #e2b0e4;
+    --pink: #eea0e6;
+    --pink-light: #fbe0f5;
+    --bg: #faf7fa;
+    --ink: #1c181d;
+    --ink-soft: #575058;
+    --accent-glow: rgba(237, 153, 226, 0.4);
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Canvas Latar Belakang - Stardust & Petals Soft */
+  #ambientCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .deck-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  /* Layout Kartu & Transisi Sinematik Soft */
+  .card-page {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 40px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.94) translateY(20px);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    z-index: 2;
+  }
+
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 880px;
+    height: 100%;
+    max-height: 640px;
+    justify-content: center;
+    z-index: 5;
+  }
+  @media (min-width: 768px) {
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 60px;
+    }
+    .card-page { padding: 60px 80px; }
+  }
+
+  .card-page.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+    z-index: 10;
+  }
+
+  .card-page.exit {
+    opacity: 0;
+    transform: scale(1.03) translateY(-20px);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  }
+
+  /* Gradasi Background Anggun */
+  .bg-1 { background: radial-gradient(circle at 30% 30%, #fbe4f8 0%, var(--purple) 60%, var(--pink) 100%); }
+  .bg-2 { background: linear-gradient(135deg, var(--pink-light) 0%, #fff 50%, var(--bg) 100%); }
+  .bg-3 { background: var(--bg); }
+  .bg-4 { background: linear-gradient(180deg, var(--bg) 0%, var(--pink-light) 100%); }
+  .bg-5 { background: radial-gradient(100% 100% at 50% 0%, #ffffff 0%, var(--pink-light) 60%, var(--purple) 100%); text-align: center; }
+
+  /* Animasi Staggered Elegan */
+  .anim {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-page.active .anim { opacity: 1; transform: translateY(0); }
+  .card-page.active .anim:nth-child(1) { transition-delay: 0.12s; }
+  .card-page.active .anim:nth-child(2) { transition-delay: 0.25s; }
+
+  /* Tipografi Minimalis Modern */
+  .eyebrow { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; opacity: 0.65; margin: 0 0 12px; color: var(--ink-soft); }
+  h1 { font-size: clamp(38px, 6.5vw, 58px); font-weight: 800; line-height: 1.05; margin: 0; letter-spacing: -0.02em; }
+  .huge { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; font-size: clamp(64px, 13vw, 108px); line-height: 0.85; margin: 6px 0 16px; color: #43163e; }
+  .tagline { font-size: clamp(20px, 3.8vw, 25px); margin: 0; font-weight: 500; }
+  .script { font-family: 'Petit Formal Script', cursive; font-size: clamp(32px, 5.5vw, 42px); margin: 0; }
+  .sub { font-size: 15px; color: var(--ink-soft); margin: 0 0 16px; }
+  .name { font-weight: 700; font-size: clamp(32px, 5vw, 40px); margin: 0; }
+  .name em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+  .fine { font-size: 14px; color: var(--ink-soft); font-style: italic; }
+
+  /* Frames & Glassmorphism Soft */
+  .img-frame {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(74, 68, 75, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    max-width: 420px;
+    width: 100%;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  }
+  .img-frame:hover { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(74, 68, 75, 0.12); }
+  .img-frame img { width: 100%; display: block; height: auto; }
+
+  .polaroid {
+    background: #ffffff;
+    padding: 12px 12px 28px;
+    box-shadow: 0 18px 36px rgba(0,0,0,0.08);
+    display: inline-block;
+    max-width: 230px;
+    transform: rotate(-2.5deg);
+    border-radius: 4px;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .polaroid:hover { transform: rotate(0deg) scale(1.02); }
+
+  /* Dynamic Bloom Flower SVG */
+  .bloom-flower { width: 230px; height: 240px; margin: 0 auto 10px; position: relative; }
+  .bloom-flower svg { width: 100%; height: 100%; filter: drop-shadow(0 12px 24px var(--accent-glow)); }
+
+  .stem { stroke: #6b9e59; stroke-width: 4.5; fill: none; stroke-dasharray: 180; stroke-dashoffset: 180; stroke-linecap: round; }
+  .card-page.active .stem { animation: draw-stem 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s; }
+  @keyframes draw-stem { to { stroke-dashoffset: 0; } }
+
+  .leaf { fill: #85b874; transform: scale(0); opacity: 0; transform-origin: center; }
+  .card-page.active .leaf { animation: leaf-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.6s; }
+  @keyframes leaf-pop { to { transform: scale(1); opacity: 1; } }
+
+  .petal-outer, .petal-middle, .petal-inner {
+    transform-origin: 120px 130px;
+    transform: scale(0) rotate(-30deg);
+    opacity: 0;
+  }
+  .petal-outer { fill: url(#petalGradOuter); }
+  .petal-middle { fill: url(#petalGradMid); }
+  .petal-inner { fill: url(#petalGradInner); }
+
+  .card-page.active .petal-outer,
+  .card-page.active .petal-middle,
+  .card-page.active .petal-inner {
+    animation: organic-bloom 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .card-page.active .petal-outer { animation-delay: 0.7s; }
+  .card-page.active .petal-middle { animation-delay: 0.85s; }
+  .card-page.active .petal-inner { animation-delay: 1s; }
+
+  @keyframes organic-bloom { to { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+  .bloom-flower.celebrate-bloom {
+    animation: gentle-pulse 2.5s ease-in-out infinite alternate;
+  }
+  @keyframes gentle-pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08) rotate(4deg); }
+  }
+
+  .bloom-question {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(28px, 5.5vw, 36px);
+    margin: 10px 0 6px;
+    color: var(--ink);
+  }
+
+  /* Interactive Buttons */
+  .bloom-buttons { position: relative; height: 60px; margin-top: 20px; z-index: 20; }
+  .btn {
+    border: none;
+    border-radius: 999px;
+    padding: 16px 36px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  .btn-yes {
+    background: var(--ink);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(28, 24, 29, 0.2);
+  }
+  .btn-yes:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 14px 30px rgba(28, 24, 29, 0.28);
+  }
+
+  .btn-no {
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.05);
+    position: absolute;
+    left: calc(50% + 75px);
+    top: 0;
+    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Celebration Card Result */
+  .bloom-celebrate {
+    display: none;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(30px, 6vw, 42px);
+    color: #4a1142;
+    margin-top: 14px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+  }
+  .bloom-celebrate.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Soft Hint Text */
+  .tap-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 50;
+    animation: gentle-fade 2.5s infinite ease-in-out;
+  }
+  @keyframes gentle-fade { 0%, 100%{ opacity: 0.3; } 50%{ opacity: 0.7; } }
+
+  /* Soft Tap Particle Ring */
+  .click-flower-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    animation: burst-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes burst-fade {
+    0% { transform: translate(-50%, -50%) scale(0.2) rotate(0deg); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1.4) rotate(120deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient Canvas (Stardust & Floating Petals) -->
+<canvas id="ambientCanvas"></canvas>
+
+<div class="deck-container" id="deckContainer">
+  
+  <!-- HALAMAN 1: HERO -->
+  <div class="card-page bg-1 active">
+    <div class="card-grid">
+      <div class="anim">
+        <p class="eyebrow">proposal kanaga marseta</p>
+        <h1>Kenapa<br>Kak Dika</h1>
+      </div>
+      <div class="anim" style="text-align: right;">
+        <p class="huge">harusssss</p>
+        <p class="tagline">jadi <b>kanaga</b> aku 🥺....</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 2: INTRO -->
+  <div class="card-page bg-2">
+    <div class="card-grid">
+      <div class="anim">
+        <p class="script">Sebelumnya….</p>
+        <p class="sub">tak kenal maka kenalan hehe….</p>
+        <p class="name">hai aku<br><em>Marseta</em></p>
+        <p class="fine">Ceta / Seta juga boleeeeh</p>
+      </div>
+      <div class="anim img-frame" style="margin:0 auto;">
+        <img src="Home.png">
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 3: KENALAN -->
+  <div class="card-page bg-3">
+    <div class="card-grid">
+      <div class="anim">
+        <p class="eyebrow">#KENALANSINGKAT</p>
+        <h2 style="font-size:26px; font-weight:800; margin:0 0 6px;">NIM AKU 17425101!!!!</h2>
+        <p class="fine">kalau 25 nya diganti 24 jadi nim siapa yaaa…?</p>
+        <p style="font-size:16px; margin-top:16px;">aku suka <b>memotret</b> & kata orang aku <b>eksperimentalis</b>… 🌸</p>
+      </div>
+      <div class="anim" style="text-align:center;">
+        <div class="polaroid">
+          <img src="Kenapa Kak dika.png" alt="Foto Polaroid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 4: PITCH -->
+  <div class="card-page bg-4">
+    <div class="card-grid">
+      <div class="anim">
+        <h2 style="font-size:26px; font-weight:800; line-height:1.25;">KENAPA akumau kadika<br>jadi mkg (my kanaga gweh)</h2>
+        <p class="fine" style="margin-top:14px;">#orangjago kata kak mira kakak john properti (aku bisa ngaci btw)</p>
+        <p style="font-size:14px; margin-top:10px;">reviwe dari ka mira lily hilda kaka orang baik 🥹</p>
+      </div>
+      <div class="anim img-frame" style="margin:0 auto;">
+        <img src="Kenapa Kak dika (5).png" alt="Divisi Tim">
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 5: BLOOM / PROPOSAL -->
+  <div class="card-page bg-5">
+    <div class="bloom-flower" id="mainBloom">
+      <svg viewBox="0 0 240 260">
+        <defs>
+          <radialGradient id="petalGradOuter" cx="50%" cy="15%" r="85%">
+            <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#db79cd"/>
+          </radialGradient>
+          <radialGradient id="petalGradMid" cx="50%" cy="20%" r="80%">
+            <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#e790db"/>
+          </radialGradient>
+          <radialGradient id="petalGradInner" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#fff8fe"/><stop offset="100%" stop-color="#ee8ce0"/>
+          </radialGradient>
+        </defs>
+
+        <path class="stem" d="M120,150 C110,185 130,205 120,245" />
+        <path class="leaf" d="M120,190 C90,182 75,200 70,218 C100,218 115,205 120,190 Z" />
+
+        <g>
+          <g transform="rotate(0 120 130)"><path class="petal-outer" d="M120,130 C95,95 98,50 120,20 C142,50 145,95 120,130 Z"/></g>
+          <g transform="rotate(72 120 130)"><path class="petal-outer" d="M120,130 C95,95 98,50 120,20 C142,50 145,95 120,130 Z"/></g>
+          <g transform="rotate(144 120 130)"><path class="petal-outer" d="M120,130 C95,95 98,50 120,20 C142,50 145,95 120,130 Z"/></g>
+          <g transform="rotate(216 120 130)"><path class="petal-outer" d="M120,130 C95,95 98,50 120,20 C142,50 145,95 120,130 Z"/></g>
+          <g transform="rotate(288 120 130)"><path class="petal-outer" d="M120,130 C95,95 98,50 120,20 C142,50 145,95 120,130 Z"/></g>
+        </g>
+        <circle cx="120" cy="130" r="14" fill="#fde68a" />
+      </svg>
+    </div>
+
+    <p class="bloom-question" id="bloomText">maukah kak dika<br>jadi kanaga aku?</p>
+    <p class="fine" id="bloomSub">🌸 menunggu jawabannya 🌸</p>
+
+    <div class="bloom-buttons" id="bloomButtons">
+      <button class="btn btn-yes" id="btnYes" type="button">iya, aku mauuu</button>
+      <button class="btn btn-no" id="btnNo" type="button">hmm gamau</button>
+    </div>
+
+    <p class="bloom-celebrate" id="bloomCelebrate">yeayyy makasii kak dikaaa 🥰🌸✨</p>
+  </div>
+
+  <div class="tap-hint" id="tapHint">Tap di mana saja untuk lanjut ➔</div>
+</div>
+
+<script>
+  /* Ambient Particles - High-End Soft Glowing Petals & Stardust */
+  const canvas = document.getElementById('ambientCanvas');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const particles = Array.from({ length: 28 }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    size: Math.random() * 4 + 2,
+    dx: (Math.random() - 0.5) * 0.6,
+    dy: Math.random() * 0.8 + 0.3,
+    rot: Math.random() * 360,
+    rotSpeed: (Math.random() - 0.5) * 1.2,
+    opacity: Math.random() * 0.4 + 0.2,
+    color: ['#e2b0e4', '#eea0e6', '#fbe0f5', '#ffffff'][Math.floor(Math.random() * 4)]
+  }));
+
+  function renderAmbient() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.opacity;
+      
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size, p.size * 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      p.x += p.dx;
+      p.y += p.dy;
+      p.rot += p.rotSpeed;
+
+      if (p.y > height + 10) { p.y = -10; p.x = Math.random() * width; }
+      if (p.x > width) p.x = 0;
+      if (p.x < 0) p.x = width;
+    });
+    requestAnimationFrame(renderAmbient);
+  }
+  renderAmbient();
+
+  /* Deck Navigation System */
+  let currentStep = 0;
+  const pages = document.querySelectorAll('.card-page');
+  const totalSteps = pages.length;
+  const tapHint = document.getElementById('tapHint');
+
+  function spawnSoftBurst(x, y) {
+    const burst = document.createElement('div');
+    burst.className = 'click-flower-burst';
+    burst.style.left = x + 'px';
+    burst.style.top = y + 'px';
+    burst.innerHTML = `
+      <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+        <g transform="translate(50,50)">
+          <path d="M0,0 C-12,-30 -4,-38 0,-38 C4,-38 12,-30 0,0" fill="#eea0e6" opacity="0.8"/>
+          <path d="M0,0 C-12,-30 -4,-38 0,-38 C4,-38 12,-30 0,0" fill="#e2b0e4" transform="rotate(72)" opacity="0.8"/>
+          <path d="M0,0 C-12,-30 -4,-38 0,-38 C4,-38 12,-30 0,0" fill="#eea0e6" transform="rotate(144)" opacity="0.8"/>
+          <path d="M0,0 C-12,-30 -4,-38 0,-38 C4,-38 12,-30 0,0" fill="#e2b0e4" transform="rotate(216)" opacity="0.8"/>
+          <path d="M0,0 C-12,-30 -4,-38 0,-38 C4,-38 12,-30 0,0" fill="#eea0e6" transform="rotate(288)" opacity="0.8"/>
+          <circle cx="0" cy="0" r="6" fill="#fde68a"/>
+        </g>
+      </svg>
+    `;
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 800);
+  }
+
+  function goToNextStep() {
+    if (currentStep < totalSteps - 1) {
+      pages[currentStep].classList.remove('active');
+      pages[currentStep].classList.add('exit');
+      
+      currentStep++;
+      pages[currentStep].classList.add('active');
+
+      if (currentStep === totalSteps - 1) {
+        tapHint.style.display = 'none';
+      }
+    }
+  }
+
+  document.getElementById('deckContainer').addEventListener('click', (e) => {
+    if (e.target.closest('#bloomButtons')) return;
+    spawnSoftBurst(e.clientX, e.clientY);
+    goToNextStep();
+  });
+
+  /* Smooth Runaway Button */
+  const btnNo = document.getElementById('btnNo');
+  function dodge(e) {
+    if (e) e.stopPropagation();
+    const maxLeft = 140;
+    const maxTop = 40;
+    const newLeft = (Math.random() * maxLeft - 70);
+    const newTop = (Math.random() * maxTop - 20);
+    btnNo.style.left = `calc(50% + ${newLeft}px)`;
+    btnNo.style.top = newTop + 'px';
+  }
+
+  if (btnNo) {
+    btnNo.addEventListener('mouseenter', dodge);
+    btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); dodge(e); }, { passive: false });
+    btnNo.addEventListener('click', dodge);
+  }
+
+  /* Elegan & Classy Celebration Sequence */
+  const btnYes = document.getElementById('btnYes');
+  const btnWrap = document.getElementById('bloomButtons');
+  const celebrate = document.getElementById('bloomCelebrate');
+  const mainBloom = document.getElementById('mainBloom');
+  const bloomSub = document.getElementById('bloomSub');
+
+  if (btnYes) {
+    btnYes.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btnWrap.style.display = 'none';
+      if (bloomSub) bloomSub.style.display = 'none';
+
+      celebrate.classList.add('show');
+      mainBloom.classList.add('celebrate-bloom');
+
+      // Subtle & Classy Confetti Burst (Rose Gold & Soft Pastels)
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.65 },
+        colors: ['#e2b0e4', '#eea0e6', '#fbe0f5', '#ffffff', '#fde68a'],
+        scalar: 0.9,
+        ticks: 200
+      });
+
+      // Side Stream Fireworks Soft Burst
+      setTimeout(() => {
+        confetti({
+          particleCount: 40,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#e2b0e4', '#fbe0f5']
+        });
+        confetti({
+          particleCount: 40,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#eea0e6', '#fbe0f5']
+        });
+      }, 300);
+
+      // Subtle Bloom Tap Pulse Effect
+      const rect = btnYes.getBoundingClientRect();
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          spawnSoftBurst(rect.left + 50 + (Math.random() * 80 - 40), rect.top + (Math.random() * 40 - 20));
+        }, i * 160);
+      }
+    });
+  }
+</script>
+</body>
+</html>
