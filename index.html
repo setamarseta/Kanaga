@@ -6,7 +6,7 @@
 <title>Kenapa Kak Dika harusssss jadi kanaga aku</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400;1,600&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400;1,600;1,800&family=Petit+Formal+Script&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -32,6 +32,7 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    transition: background 1.2s ease;
   }
 
   #ambientCanvas {
@@ -41,6 +42,27 @@
     height: 100%;
     pointer-events: none;
     z-index: 1;
+  }
+
+  /* Beam Flash Overlay */
+  #superGlowOverlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(238, 160, 230, 0.8) 50%, rgba(67, 22, 62, 0.95) 100%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #superGlowOverlay.flash {
+    animation: flashGlow 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes flashGlow {
+    0% { opacity: 0; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.4); }
   }
 
   .deck-container {
@@ -100,7 +122,15 @@
   .bg-2 { background: linear-gradient(180deg, #ffffff 0%, var(--pink-light) 100%); }
   .bg-3 { background: var(--bg); }
   .bg-4 { background: linear-gradient(180deg, var(--bg) 0%, var(--pink-light) 100%); }
-  .bg-5 { background: radial-gradient(circle at 50% 20%, #ffffff 0%, var(--pink-light) 60%, var(--purple) 100%); }
+  .bg-5 { background: radial-gradient(circle at 50% 20%, #ffffff 0%, var(--pink-light) 60%, var(--purple) 100%); transition: background 1.2s ease; }
+
+  /* Mode WOW Celebration Background */
+  body.celebrate-mode {
+    background: #2a082b !important;
+  }
+  .bg-5.celebrate-active {
+    background: radial-gradient(circle at 50% 40%, #581655 0%, #2a082b 60%, #120213 100%) !important;
+  }
 
   .anim {
     opacity: 0;
@@ -187,8 +217,8 @@
     overflow: hidden;
   }
 
-  .bloom-flower { width: 180px; height: 190px; margin: 0 auto 12px; position: relative; }
-  .bloom-flower svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px var(--accent-glow)); }
+  .bloom-flower { width: 180px; height: 190px; margin: 0 auto 12px; position: relative; transition: transform 0.8s ease, filter 0.8s ease; }
+  .bloom-flower svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px var(--accent-glow)); transition: filter 0.8s ease; }
 
   .stem { stroke: #6b9e59; stroke-width: 4.5; fill: none; stroke-dasharray: 180; stroke-dashoffset: 180; stroke-linecap: round; }
   .card-page.active .stem { animation: draw-stem 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s; }
@@ -207,8 +237,15 @@
   .card-page.active .petal-outer { animation: organic-bloom 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.7s; }
   @keyframes organic-bloom { to { transform: scale(1) rotate(0deg); opacity: 1; } }
 
-  .bloom-flower.celebrate-bloom { animation: gentle-pulse 2.5s ease-in-out infinite alternate; }
-  @keyframes gentle-pulse { 0% { transform: scale(1); } 100% { transform: scale(1.06) rotate(3deg); } }
+  .bloom-flower.celebrate-bloom { 
+    transform: scale(1.15) rotate(0deg);
+    filter: drop-shadow(0 0 35px #eea0e6) drop-shadow(0 0 60px #ffffff);
+    animation: super-pulse 2s ease-in-out infinite alternate;
+  }
+  @keyframes super-pulse { 
+    0% { transform: scale(1.1) rotate(-3deg); filter: drop-shadow(0 0 30px #eea0e6) drop-shadow(0 0 50px #ffffff); } 
+    100% { transform: scale(1.22) rotate(3deg); filter: drop-shadow(0 0 50px #fbe0f5) drop-shadow(0 0 90px #eea0e6); } 
+  }
 
   .bloom-question {
     font-family: 'Playfair Display', serif;
@@ -217,6 +254,7 @@
     font-size: clamp(24px, 5vw, 32px);
     margin: 12px 0 4px;
     color: var(--ink);
+    transition: color 0.8s ease;
   }
 
   .bloom-buttons { position: relative; height: 60px; margin-top: 24px; width: 100%; z-index: 20; }
@@ -248,19 +286,25 @@
     transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Ucapan Terakhir WOW */
   .bloom-celebrate {
     display: none;
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-weight: 700;
-    font-size: clamp(26px, 5.5vw, 36px);
-    color: #4a1142;
-    margin-top: 16px;
+    font-weight: 800;
+    font-size: clamp(28px, 6vw, 42px);
+    color: #ffffff;
+    text-shadow: 0 0 20px #eea0e6, 0 0 40px #e2b0e4;
+    margin-top: 20px;
     opacity: 0;
-    transform: translateY(12px);
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    transform: scale(0.7) translateY(20px);
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.8s ease;
   }
-  .bloom-celebrate.show { display: block; opacity: 1; transform: translateY(0); }
+  .bloom-celebrate.show { 
+    display: block; 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
 
   .tap-hint {
     position: absolute;
@@ -292,10 +336,21 @@
     0% { transform: translate(-50%, -50%) scale(0.2) rotate(0deg); opacity: 0.9; }
     100% { transform: translate(-50%, -50%) scale(1.3) rotate(100deg); opacity: 0; }
   }
+
+  .shake-screen {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+  }
 </style>
 </head>
 <body>
 
+<div id="superGlowOverlay"></div>
 <canvas id="ambientCanvas"></canvas>
 
 <div class="deck-container" id="deckContainer">
@@ -309,7 +364,7 @@
       </div>
       <div class="anim">
         <p class="huge">harusssss</p>
-        <p class="tagline">jadi <b>kanaga</b> aku 🥺....</p>
+        <p class="tagline">jadi <b>kanaga</b> aku....</p>
       </div>
     </div>
   </div>
@@ -322,7 +377,7 @@
         <p class="script">Eits, sebelumnya...</p>
       </div>
       <div class="anim">
-        <p class="tagline" style="margin: 8px 0 16px;">sambil pencet ini lagu untuk kakak 🎵</p>
+        <p class="tagline" style="margin: 8px 0 16px;">sambil pencet ini lagu untuk kakak</p>
       </div>
       <div class="anim audio-card">
         <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2247278399&color=%23eea0e6&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
@@ -359,32 +414,70 @@
         <p class="fine">kalau 25 nya diganti 24 jadi nim siapa yaaa…?</p>
       </div>
       <div class="anim polaroid">
-        <img src="Kenapa Kak dika (1).png" alt="Photo">
+        <img src="Kenapa Kak dika (2).png" alt="Photo">
       </div>
       <div class="anim">
-        <p style="font-size:15px; margin:0;">aku suka <b>memotret</b> & kata orang aku <b>eksperimentalis</b>… 🌸</p>
+        <p style="font-size:15px; margin:0;">aku suka <b>memotret</b> & kata orang aku <b>eksperimentalis</b>…</p>
       </div>
     </div>
   </div>
 
-  <!-- HALAMAN 5: PITCH -->
+  <!-- HALAMAN 5: PITCH HEADER -->
   <div class="card-page bg-4">
     <div class="card-content">
       <div class="anim">
-        <h2 style="font-size:22px; font-weight:700; line-height:1.3; margin:0;">KENAPA aku mau ka dika<br>jadi mkg (my kanaga gweh)</h2>
-        <p class="fine" style="margin-top:8px;">#orangjago kata kak mira kakak john properti (aku bisa ngaci btw)</p>
+        <p class="eyebrow">THE REASON</p>
+        <h2 style="font-size:24px; font-weight:700; line-height:1.3; margin:0 0 12px;">KENAPA aku mau ka dika<br>jadi mkg (my kanaga gweh)?</h2>
       </div>
       <div class="anim img-frame">
         <img src="Kenapa Kak dika (5).png" alt="Divisi Tim">
       </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 6: REVIEW KAK MIRA & JOHN -->
+  <div class="card-page bg-2">
+    <div class="card-content">
       <div class="anim">
-        <p style="font-size:13px; color: var(--ink-soft); margin:0;">review dari ka mira lily hilda kaka orang baik 🥹</p>
+        <p class="eyebrow">KATA MEREKA</p>
+        <p class="huge" style="font-size:42px; margin:8px 0;">#orangjago</p>
+      </div>
+      <div class="anim" style="background:rgba(255,255,255,0.6); padding:20px; border-radius:20px; border:1px solid rgba(255,255,255,0.8); margin:12px 0;">
+        <p style="font-size:16px; font-weight:600; margin:0;">kata kak mira & kakak john properti</p>
+        <p class="fine" style="margin-top:6px;">(aku bisa ngaci btw)</p>
       </div>
     </div>
   </div>
 
-  <!-- HALAMAN 6: BLOOM / PROPOSAL -->
-  <div class="card-page bg-5">
+  <!-- HALAMAN 7: REVIEW KAK MIRA LILY HILDA -->
+  <div class="card-page bg-3">
+    <div class="card-content">
+      <div class="anim">
+        <p class="eyebrow">REVIEW JUJUR</p>
+        <p class="script">Testimoni</p>
+      </div>
+      <div class="anim" style="background:rgba(255,255,255,0.6); padding:24px; border-radius:20px; border:1px solid rgba(255,255,255,0.8); margin:16px 0;">
+        <p style="font-size:18px; font-weight:600; line-height:1.4; margin:0 0 8px;">review dari ka mira, lily, & hilda...</p>
+        <p class="huge" style="font-size:30px; margin:4px 0;">kaka orang baik</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 8: JAGO ML (SLIDE TERPISAH) -->
+  <div class="card-page bg-4">
+    <div class="card-content">
+      <div class="anim">
+        <p class="eyebrow">EXTRA REASON</p>
+        <p class="script">Kata Kak Mira...</p>
+      </div>
+      <div class="anim" style="background:rgba(255,255,255,0.6); padding:28px; border-radius:24px; border:1px solid rgba(255,255,255,0.8); margin:20px 0;">
+        <h2 style="font-size:30px; font-weight:800; color:#4a1142; margin:0;">kaka jago anti poke </h2
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN 9: BLOOM / PROPOSAL -->
+  <div class="card-page bg-5" id="proposalPage">
     <div class="card-content">
       <div class="bloom-flower" id="mainBloom">
         <svg viewBox="0 0 240 260">
@@ -414,7 +507,7 @@
         <button class="btn btn-no" id="btnNo" type="button">hmm gamau</button>
       </div>
 
-      <p class="bloom-celebrate" id="bloomCelebrate">yeayyy makasii kak dikaaa 🥰🌸✨</p>
+      <p class="bloom-celebrate" id="bloomCelebrate">yeayyy makasii kak dikaaa</p>
     </div>
   </div>
 
@@ -432,7 +525,8 @@
     height = canvas.height = window.innerHeight;
   });
 
-  const particles = Array.from({ length: 24 }, () => ({
+  let particleSpeedMultiplier = 1;
+  const particles = Array.from({ length: 30 }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
     size: Math.random() * 3.5 + 2,
@@ -457,9 +551,9 @@
       ctx.fill();
       ctx.restore();
 
-      p.x += p.dx;
-      p.y += p.dy;
-      p.rot += p.rotSpeed;
+      p.x += p.dx * particleSpeedMultiplier;
+      p.y += p.dy * particleSpeedMultiplier;
+      p.rot += p.rotSpeed * particleSpeedMultiplier;
 
       if (p.y > height + 10) { p.y = -10; p.x = Math.random() * width; }
       if (p.x > width) p.x = 0;
@@ -532,28 +626,74 @@
     btnNo.addEventListener('click', dodge);
   }
 
+  /* CELEBRATION WOW ANIMATION SEQUENCE */
   const btnYes = document.getElementById('btnYes');
   const btnWrap = document.getElementById('bloomButtons');
   const celebrate = document.getElementById('bloomCelebrate');
   const mainBloom = document.getElementById('mainBloom');
   const bloomSub = document.getElementById('bloomSub');
+  const bloomText = document.getElementById('bloomText');
+  const proposalPage = document.getElementById('proposalPage');
+  const flashOverlay = document.getElementById('superGlowOverlay');
 
   if (btnYes) {
     btnYes.addEventListener('click', (e) => {
       e.stopPropagation();
+
       btnWrap.style.display = 'none';
       if (bloomSub) bloomSub.style.display = 'none';
+      if (bloomText) bloomText.style.display = 'none';
 
-      celebrate.classList.add('show');
+      flashOverlay.classList.add('flash');
+      document.body.classList.add('shake-screen');
+      setTimeout(() => document.body.classList.remove('shake-screen'), 600);
+
+      document.body.classList.add('celebrate-mode');
+      proposalPage.classList.add('celebrate-active');
+
       mainBloom.classList.add('celebrate-bloom');
 
+      particleSpeedMultiplier = 3;
+      particles.forEach(p => {
+        p.color = '#ffffff';
+        p.size *= 1.5;
+        p.opacity = 0.8;
+      });
+
+      setTimeout(() => {
+        celebrate.classList.add('show');
+      }, 400);
+
+      const duration = 3 * 1000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 7,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#ffffff', '#eea0e6', '#fde68a']
+        });
+        confetti({
+          particleCount: 7,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#ffffff', '#e2b0e4', '#fbe0f5']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+
       confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.65 },
-        colors: ['#e2b0e4', '#eea0e6', '#fbe0f5', '#ffffff', '#fde68a'],
-        scalar: 0.85,
-        ticks: 180
+        particleCount: 120,
+        spread: 100,
+        origin: { y: 0.5 },
+        colors: ['#ffffff', '#eea0e6', '#e2b0e4', '#fde68a'],
+        scalar: 1.2
       });
     });
   }
